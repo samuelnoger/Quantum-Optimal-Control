@@ -31,27 +31,18 @@ Instead of relying on nominal design guesses, the pipeline calibrates unknown ha
 ## Project Structure
 
 ```text
-configs/two_qubit_CZ.yaml           Hardware and optimization hyperparameter configuration
-src/config.py                       Configuration parser
-src/physics/operators.py            Transmon and two-qubit Hamiltonian builders
-src/physics/propagators.py          JAX time-evolution and matrix exponentiation step functions
-src/control/pulses.py               Fourier basis generator and Gaussian low-pass filters
-src/optimization/losses.py          Loss functions for calibration and CZ gate optimization
-src/optimization/fitters.py         Digital twin calibration fitter (DigitalTwinFitter)
-src/optimization/training_loops.py  Optimization loop and setup helpers
-src/verification/qutip_device.py    QuTiP 'HiddenDevice' hardware simulator with decoherence & shot noise
-src/verification/benchmarks.py      Cross-validation and Conditional Ramsey experiment runners
-03_calibrate_then_control.ipynb     Main interactive workflow notebook
-
-```
-
-## Quick Start
-
-```bash
-pip install -r requirements.txt
-
-# Run through the end-to-end workflow in the interactive notebook
-jupyter notebook notebooks/03_calibrate_then_control.ipynb
+configs/two_qubit_CZ.yaml               Hardware and optimization hyperparameter configuration
+src/config.py                           Configuration parser
+src/physics/operators.py                Transmon and two-qubit Hamiltonian builders
+src/physics/propagators.py              JAX time-evolution and matrix exponentiation step functions
+src/control/pulses.py                   Fourier basis generator and Gaussian low-pass filters
+src/optimization/losses.py              Loss functions for calibration and CZ gate optimization
+src/optimization/fitters.py             Digital twin calibration fitter (DigitalTwinFitter)
+src/optimization/training_loops.py      Optimization loop and setup helpers
+src/verification/qutip_device.py        QuTiP 'HiddenDevice' hardware simulator with decoherence & shot noise
+src/verification/benchmarks.py          Cross-validation and Conditional Ramsey experiment runners
+notebooks/two_qubit_cz_gate.ipynb       Optimal CZ control
+notebooks/calibrate_and_control.ipynb   Main interactive workflow notebook
 
 ```
 
