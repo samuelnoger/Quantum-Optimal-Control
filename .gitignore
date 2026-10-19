@@ -1,0 +1,20 @@
+# Python / JAX
+__pycache__/
+*.pyc
+*.pyo
+.pyd
+venv/
+env/
+.env
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# OS / IDE files
+.DS_Store
+.vscode/
+.idea/
+
+# Output plots and data runs
+outputs/
+*.png
