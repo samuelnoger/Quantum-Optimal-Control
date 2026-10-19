@@ -1,0 +1,9 @@
+jax>=0.4.0
+jaxlib>=0.4.0
+qutip>=4.7.0
+optax>=0.1.5
+numpy>=1.22.0
+scipy>=1.8.0
+matplotlib>=3.5.0
+tqdm>=4.60.0
+PyYAML>=6.0
