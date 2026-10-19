@@ -2,7 +2,6 @@
 import jax.numpy as jnp
 import jax
 import numpy as np
-from src.verification.qutip_sim import verify_pulse_qutip
 
 def generate_analytic_pulse(duration_ns, dt_ns, anharmonicity_mhz, pulse_type='drag'):
     """Generates textbook Gaussian or DRAG pulses for a pi-rotation."""
@@ -10,7 +9,7 @@ def generate_analytic_pulse(duration_ns, dt_ns, anharmonicity_mhz, pulse_type='d
     mu = duration_ns / 2
     sigma = duration_ns / 4  # Standard 4-sigma width to fit the window
     
-    # 1. Base Gaussian (I-channel)
+    # Base Gaussian (I-channel)
     I_pulse = np.exp(-0.5 * ((t - mu) / sigma)**2)
     I_pulse -= I_pulse[0]  # Force boundaries perfectly to zero
     
@@ -18,7 +17,7 @@ def generate_analytic_pulse(duration_ns, dt_ns, anharmonicity_mhz, pulse_type='d
     area = np.sum(I_pulse) * dt_ns
     I_pulse = I_pulse * (np.pi / area)
     
-    # 2. Q-channel Correction
+    # Q-channel Correction
     if pulse_type == 'drag':
         anharmonicity_ghz = anharmonicity_mhz / 1000.0
         dI_dt = np.gradient(I_pulse, dt_ns)
