@@ -9,13 +9,13 @@ The pipeline prioritizes simulation accuracy using a high-performance, JAX-based
 **1. The Digital Twin & Calibration Fitter**
 Instead of relying on nominal design guesses, the pipeline calibrates unknown hardware parameters simultaneously:
 
-* **Vectorized Swap Chevron Fitter:** Fits exchange coupling ($g$), detuning ($\Delta$), and transmon anharmonicity ($\alpha$) concurrently by probing both $\vert{}10\rangle$ and $\vert{}11\rangle$ initial states.
-* **JAX-Jitted Propagators:** Uses lightning-fast analytical matrix exponentials (`expm`) per pulse segment to accelerate gradient-based optimization via Optax (`Adam`).
+* **Vectorized Swap Chevron Fitter:** Fits exchange coupling ($g$), detuning ($\Delta$), and transmon anharmonicity ($\alpha$) concurrently by probing both $|10\rangle$ and $|11\rangle$ initial states.
+* **JAX-Jitted Propagators:** Uses fast analytical matrix exponentials (`expm`) per pulse segment to accelerate gradient-based optimization via Optax (`Adam`).
 
 **2. Bandwidth-Limited CZ Gate Optimization**
 
 * **Fourier-Basis Pulse Shaping:** Sculpting smooth flux pulses using sine harmonics filtered through a Gaussian kernel to respect real hardware bandwidth limits and prevent high-frequency leakage.
-* **Leakage Suppression:** Optimizing against non-computational states (such as $\vert{}20\rangle$) to achieve high gate fidelity.
+* **Leakage Suppression:** Optimizing against non-computational states (such as $|20\rangle$) to achieve high gate fidelity.
 
 **3. Verification & Benchmarking Infrastructure**
 
