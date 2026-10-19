@@ -1,0 +1,13 @@
+hardware:
+  anharmonicity_mhz: 200.0
+  levels: 3
+
+pulse:
+  duration_ns: 10.0
+  dt_ns: 0.1
+  max_amp_mhz: 20.0
+
+optimizer:
+  learning_rate: 0.01
+  steps: 500
+  leakage_weight: 0.1
