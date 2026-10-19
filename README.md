@@ -1,6 +1,6 @@
 # Superconducting Two-Qubit CZ Gate: Calibrate-Then-Control Pipeline
 
-This repository contains a high-fidelity simulation and optimization project for superconducting transmon qubits. The goal is to build a complete **"calibrate-then-control"** pipeline that first characterizes an unknown hardware device using a vectorized Swap Chevron fitter and then synthesizes a leakage-suppressed, bandwidth-limited Controlled-Z (CZ) gate.
+This repository contains a high-fidelity simulation and optimization project for superconducting transmon qubits. The goal is to build a complete calibration and control pipeline that first characterizes an unknown hardware device using a vectorized Swap Chevron fitter and then synthesizes a leakage-suppressed, bandwidth-limited Controlled-Z (CZ) gate.
 
 The pipeline prioritizes simulation accuracy using a high-performance, JAX-based workflow and robustly validates performance against a QuTiP-based "HiddenDevice" hardware simulator incorporating $T_1/T_2$ decoherence and projective measurement shot noise.
 
