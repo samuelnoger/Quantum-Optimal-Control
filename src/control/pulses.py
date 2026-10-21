@@ -3,8 +3,8 @@ import jax.numpy as jnp
 import jax
 import numpy as np
 
-def generate_analytic_pulse(duration_ns, dt_ns, anharmonicity_mhz, pulse_type='drag'):
-    """Generates textbook Gaussian or DRAG pulses for a pi-rotation."""
+def generate_analytic_pulse(duration_ns, dt_ns, anharmonicity_mhz, pulse_type='drag', target_angle=np.pi):
+    """Generates textbook Gaussian or DRAG pulses for arbitrary rotations."""
     t = np.arange(0, duration_ns, dt_ns)
     mu = duration_ns / 2
     sigma = duration_ns / 4  # Standard 4-sigma width to fit the window
@@ -13,9 +13,9 @@ def generate_analytic_pulse(duration_ns, dt_ns, anharmonicity_mhz, pulse_type='d
     I_pulse = np.exp(-0.5 * ((t - mu) / sigma)**2)
     I_pulse -= I_pulse[0]  # Force boundaries perfectly to zero
     
-    # Normalize total area to exactly pi (180 degrees)
+    # Normalize total area to the exact target angle (e.g., pi/2 for 90 degrees)
     area = np.sum(I_pulse) * dt_ns
-    I_pulse = I_pulse * (np.pi / area)
+    I_pulse = I_pulse * (target_angle / area)
     
     # Q-channel Correction
     if pulse_type == 'drag':
