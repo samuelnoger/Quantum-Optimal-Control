@@ -18,3 +18,4 @@ env/
 # Output plots and data runs
 outputs/
 *.png
+*.npy
