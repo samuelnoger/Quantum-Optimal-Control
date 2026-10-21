@@ -115,18 +115,6 @@ def generate_bell_state(duration_ns, dt, cal_a, cal_d, cal_pulse_rad,
         dt, H0_cal, Hx1, Hy1, Hx2, Hy2, Hz_control, cal_d, 
         v_phase1=corr_1, v_phase2=corr_2
     )
-
-
-
-    # Check total probability retained within the 4-level computational subspace [00, 01, 10, 11]
-    psi_final_9d = U_bell_corr @ psi_00
-    idx_comp = np.array([0, 1, 3, 4])
-    comp_probability = np.sum(np.abs(psi_final_9d[idx_comp])**2)
-
-    print(f"Probability inside computational subspace: {comp_probability * 100:.2f}%")
-    print(f"Probability leaked to higher qutrit states (|2> level): {(1.0 - comp_probability) * 100:.2f}%")
-
-
     
     # Extract computational 4x4 density matrices
     idx_comp = np.array([0, 1, 3, 4]) 
