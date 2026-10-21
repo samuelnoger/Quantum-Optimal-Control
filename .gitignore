@@ -9,6 +9,7 @@ env/
 
 # Jupyter Notebooks
 .ipynb_checkpoints/
+notebooks/iframe_figures/
 
 # OS / IDE files
 .DS_Store
