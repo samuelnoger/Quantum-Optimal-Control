@@ -1,6 +1,6 @@
 hardware:
   levels: 3
-  anharmonicity_mhz: -308.2 
+  anharmonicity_mhz: -305.2 
   coupling_mhz: 25.9         
   idle_detuning_mhz: 592.5   
   n_shots: 2000              
