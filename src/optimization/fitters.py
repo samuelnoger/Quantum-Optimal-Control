@@ -1,4 +1,3 @@
-# src/optimization/fitters.py
 import jax
 import jax.numpy as jnp
 import optax

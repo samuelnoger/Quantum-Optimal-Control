@@ -1,4 +1,3 @@
-# src/physics/operators.py
 import jax.numpy as jnp
 
 def build_transmon_operators(levels: int, anharmonicity_mhz: float):

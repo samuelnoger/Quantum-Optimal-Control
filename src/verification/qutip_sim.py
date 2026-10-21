@@ -1,4 +1,3 @@
-# src/verification/qutip_sim.py
 import numpy as np
 import qutip as qt
 from src.config import ExperimentConfig

@@ -1,4 +1,3 @@
-# src/control/pulses.py
 import jax.numpy as jnp
 import jax
 import numpy as np

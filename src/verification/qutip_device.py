@@ -1,4 +1,3 @@
-# src/verification/qutip_device.py
 import numpy as np
 import qutip as qt
 

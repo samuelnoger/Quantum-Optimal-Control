@@ -1,4 +1,3 @@
-# src/physics/propagators.py
 import jax
 import jax.numpy as jnp
 from jax.scipy.linalg import expm

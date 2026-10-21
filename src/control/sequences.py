@@ -1,4 +1,3 @@
-# src/control/sequences.py
 import jax
 import jax.numpy as jnp
 import numpy as np

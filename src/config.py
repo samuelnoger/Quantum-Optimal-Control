@@ -1,4 +1,3 @@
-# src/config.py
 from pathlib import Path
 import yaml
 from dataclasses import dataclass

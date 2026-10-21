@@ -1,4 +1,3 @@
-# src/optimization/losses.py
 import jax
 import jax.numpy as jnp
 from src.physics.propagators import propagate, propagate_flux
