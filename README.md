@@ -1,67 +1,90 @@
 # Superconducting Two-Qubit CZ Gate: Calibrate-Then-Control Pipeline
 
-This repository contains a high-fidelity simulation and optimization project for superconducting transmon qutrits. The goal is to build a complete calibration and control pipeline that first characterizes an unknown hardware device using a vectorized Swap Chevron fitter, synthesizes a leakage-suppressed, bandwidth-limited Controlled-Z (CZ) gate, and integrates the calibrated pulses into an end-to-end Bell state ($\Phi^+$) circuit.
+A simulation and optimization project for superconducting transmon qutrits. The pipeline (1) characterizes an unknown device with a vectorized swap-chevron fitter, (2) designs a leakage-suppressed, bandwidth-limited CZ gate on the fitted digital twin, and (3) uses that gate in an end-to-end Bell state ($\Phi^+$) circuit.
 
-The pipeline prioritizes simulation accuracy using a high-performance, JAX-based digital twin and robustly validates performance against a QuTiP-based `HiddenDevice` hardware simulator incorporating $T_1/T_2$ decoherence and projective measurement shot noise.
+A JAX digital twin is used for fitting and pulse design. Everything is then checked against a QuTiP `HiddenDevice`, a simulated device with its own "true" parameters, $T_1/T_2$ decoherence and projective-measurement shot noise. All "device" results below are from this simulator, not real hardware.
 
-## Methods & Implementation
+## Methods
 
-**1. The Digital Twin & Calibration Fitter**
-Instead of relying on nominal design guesses, the pipeline calibrates unknown hardware parameters simultaneously:
+**1. Digital twin and calibration fitter**
+- **Vectorized swap-chevron fitter:** fits exchange coupling ($g$), detuning ($\Delta$) and anharmonicity ($\alpha$) simultaneously from $|10\rangle$ and $|11\rangle$ probes.
+- **JAX-jitted propagators:** piecewise-constant matrix exponentials (`expm`) per time step, optimized with Optax (`Adam`).
 
-- **Vectorized Swap Chevron Fitter:** Fits exchange coupling ($g$), detuning ($\Delta$), and transmon anharmonicity ($\alpha$) concurrently by probing both $\vert{}10\rangle$ and $\vert{}11\rangle$ initial states.
-- **JAX-Jitted Propagators:** Uses fast analytical matrix exponentials (`expm`) per pulse segment to accelerate gradient-based optimization via Optax (`Adam`).
+**2. Bandwidth-limited CZ optimization**
+- **Fourier-basis pulse shaping:** smooth flux pulses built from sine harmonics and filtered with a Gaussian kernel to respect AWG bandwidth.
+- **Leakage suppression:** the loss penalizes population in non-computational states (e.g. $|20\rangle$).
 
-**2. Bandwidth-Limited CZ Gate Optimization**
+**3. Verification**
+- **Held-out cross-validation:** the calibrated twin is tested on 200 random waveforms it was not fitted on.
+- **Conditional Ramsey:** phase fringes on the QuTiP device verify the $\pi$ conditional phase of the CZ.
 
-- **Fourier-Basis Pulse Shaping:** Sculpts smooth flux pulses using sine harmonics filtered through a Gaussian kernel to respect real hardware AWG bandwidth limits and prevent high-frequency leakage.
-- **Leakage Suppression:** Optimizes against non-computational qutrit states (such as $\vert{}20\rangle$) to achieve high gate fidelity.
+**4. Bell state synthesis and virtual-Z calibration**
+- **Full circuit in the 9D two-qutrit space:** parallel DRAG $\pi/2$ pulses (with detuning modulation on Q1), the flux CZ, and a final $-\pi/2$ rotation on Q2.
+- **Calibrate once, then freeze:** virtual-Z phases are found on the twin with a precomputed 2D grid search plus Nelder-Mead, by maximizing $\Phi^+$ overlap. This absorbs always-on coupling and local phase accumulation.
+- **Hardware-style execution:** the Q2 phase is folded into the phase of the final drive (`build_bell_waveforms`), the whole timeline is packed with `pack_sequence` and played with `HiddenDevice.play_sequence`, and the Q1 phase is applied as a tomography-frame rotation (`apply_frame`).
 
-**3. Verification & Benchmarking Infrastructure**
+## Parameter assumption
 
-- **Held-Out Cross-Validation:** Tests the calibrated digital twin against 200 random, time-varying waveforms it has never seen before to prove generalization accuracy.
-- **Conditional Ramsey Experiments:** Simulates physical phase-fringes on the QuTiP hardware simulator to verify the exact $\pi$ ($180^\circ$) conditional phase shift of the CZ gate.
+The twin uses the **fitted** parameters from the calibration notebook (fit errors: [TODO: insert from calibration run]). The `HiddenDevice` uses the **true** parameters from the config plus $T_1/T_2$. The device comparison therefore includes both fit error and decoherence.
 
-**4. End-to-End Bell State Synthesis & Virtual-Z Calibration**
+## Results
 
-- **Full-Circuit Pulse Integration:** Combines parallel single-qubit DRAG preparation pulses (with detuning modulation), the flux-tuned CZ gate, and a final single-qubit rotation in the full 9D two-qutrit space.
-- **Calibrate-Once Virtual-Z Sweep:** Calibrates single-qubit Virtual-Z phase corrections on the Digital Twin using a precomputed 2D grid search and Nelder-Mead refinement to compensate for always-on coupling and local phase accumulation.
-- **Physical Frame Execution on Hardware:** Freezes the twin-calibrated phases and executes the full concatenated waveform timeline (`play_sequence`) on the open-system QuTiP `HiddenDevice` by physically shifting the subsequent microwave drive phase and rotating the final tomography readout frame.
+**Calibration and CZ**
+- **Parameter recovery:** fitted $g$, $\Delta$, $\alpha$ within [TODO: < 0.01 MHz, confirm from saved output] of the true values with 2,000-shot measurements.
+- **Generalization:** on held-out random waveforms, calibration reduces mean population prediction error from ~9.3% (uncalibrated) to ~0.09%, close to the $T_1/T_2$ floor.
+- **Calibrated vs. uncalibrated CZ:** on the device model, the calibrated pulse substantially reduces leakage and gives the intended $\pi$ conditional phase.
 
-## Key Observations
+**Bell state** (all rows use the same drive-rotated circuit, so they are directly comparable)
 
-- **Parameter Convergence:** The JAX calibration fitter converges to true hardware parameters within $<0.01\text{ MHz}$ error even under realistic finite-shot measurement noise ($2,000$ shots).
-- **Generalization:** Cross-validation against held-out random waveforms showed that calibration reduces population prediction error from $\sim 9.3\%$ down to the physical $T_1/T_2$ noise floor ($\sim 0.09\%$).
-- **Hardware Validation:** Comparing uncalibrated versus calibrated pulses on the QuTiP fridge proves that calibration is essential for eliminating population leakage and achieving an accurate $180^\circ$ phase flip.
-- **End-to-End Entanglement:** Playing the full Bell state pulse sequence with frozen twin-calibrated Virtual-Z phases on the noisy QuTiP `HiddenDevice` achieves a **98.10%** $\Phi^+$ Bell state fidelity while retaining **99.48%** population in the computational subspace ($0.52\%$ qutrit leakage).
+| Simulator | Parameters | Noise | $\Phi^+$ fidelity |
+|---|---|---|---|
+| JAX twin | fitted | none | 98.28% |
+| QuTiP device | fitted | none | 98.31% |
+| QuTiP device | true | $T_1/T_2$ | **98.10%** |
 
-## Notebooks Overview
+- The fitted-parameter noiseless device matches the twin to ~3e-4 in state overlap, which confirms the two implementations are consistent.
+- Going from the twin to the full device model costs about 0.2%, combining fit error and decoherence. Phases calibrated on the twin were not re-tuned on the device.
+- 99.48% of the population stays in the computational subspace (0.52% leakage). The remaining infidelity comes mostly from the gate itself (conditional phase, residual ZZ during the single-qubit pulses, leakage), not from the virtual-Z calibration.
+- Fidelity is $\langle\Phi^+|\rho_{\text{comp}}|\Phi^+\rangle$ on the unnormalized computational block, so leakage counts as loss.
+- Sequence: two [TODO: 20] ns single-qubit pulses plus a [TODO] ns CZ, so $T_1/T_2$ contribute a small share of the error.
+- Note: a variant that applies the virtual Z as a matrix between CZ and the last pulse scores 97.53% at the same phases. This is a slightly different circuit (the identity between the two holds only approximately because of the always-on coupling). [TODO: re-optimize phases on the drive-rotated circuit and update.]
 
-- **`calibrate_and_control.ipynb`**: The main interactive calibration and validation workflow. Executes the Digital Twin Swap Chevron calibration, trains the CZ pulse, and cross-validates the calibrated model against the QuTiP `HiddenDevice` simulator.
-- **`two_qubit_cz_gate.ipynb`**: Focuses on optimal CZ gate control. Uses JAX-based optimization to shape bandwidth-limited Fourier flux pulses and visualizes the state population and conditional phase dynamics across the $\vert{}11\rangle \leftrightarrow \vert{}20\rangle$ avoided crossing.
-- **`analog_bell_state.ipynb`**: The capstone notebook. Performs a 2D Virtual-Z calibration sweep on the Digital Twin, freezes the optimal phase offsets, and executes the complete DRAG + CZ pulse sequence on both the noiseless JAX twin and the open-system QuTiP hardware simulator to generate a 98.10% fidelity $\Phi^+$ Bell state.
+## Notebooks
+
+Run in this order (the Bell notebook loads `configs/cal_pulse_rad.npy`, which the calibration notebook saves).
+
+1. **`calibrate_and_control.ipynb`:** swap-chevron calibration, CZ training, cross-validation, Ramsey checks on the device.
+2. **`two_qubit_cz_gate.ipynb`:** CZ optimization and visualization of the $|11\rangle \leftrightarrow |20\rangle$ avoided crossing.
+3. **`analog_bell_state.ipynb`:** virtual-Z calibration on the twin, implementation check (device vs. twin), and the Bell state on the noisy device.
+
+## Setup
+
+Python 3.11, JAX (with `jax_enable_x64` enabled in the notebooks), Optax, QuTiP [TODO: version], NumPy, SciPy, Matplotlib, Plotly. [TODO: add requirements file.]
+
+## Limitations
+
+- Three levels per transmon, no crosstalk, no flux-line distortion, no readout error beyond shot noise.
+- The twin is noiseless and the device is a simulator, so these results show that the calibrate-then-control workflow is sound, not that it would reach the same fidelity on a real chip.
+- Short sequence relative to $T_1/T_2$, so decoherence is a minor error source here.
 
 ## Project Structure
 
 ```text
-configs/two_qubit_CZ.yaml               Hardware and optimization hyperparameter configuration
+configs/two_qubit_CZ.yaml               Hardware and optimizer configuration
 src/config.py                           Configuration parser
 src/physics/operators.py                Transmon and two-qubit Hamiltonian builders
-src/physics/propagators.py              JAX time-evolution and matrix exponentiation step functions
-src/control/pulses.py                   DRAG pulse generator, Fourier basis, and Gaussian filters
-src/control/sequences.py                Bell state pulse sequences and 2D Virtual-Z calibration
-src/optimization/losses.py              Loss functions for calibration and CZ gate optimization
-src/optimization/fitters.py             Digital twin calibration fitter (DigitalTwinFitter)
-src/optimization/training_loops.py      Optimization loop and setup helpers
-src/verification/qutip_device.py        QuTiP 'HiddenDevice' hardware simulator with decoherence & shot noise
-src/verification/benchmarks.py          Cross-validation and Conditional Ramsey experiment runners
-src/verification/plots.py               3D density matrix cityscape visualization helpers
-notebooks/two_qubit_cz_gate.ipynb       Optimal CZ control and state dynamics
-notebooks/calibrate_and_control.ipynb   Main interactive calibration and validation workflow
-notebooks/analog_bell_state.ipynb       Full pipeline integration and 98.10% Bell state generation
-
+src/physics/propagators.py              JAX time-evolution step functions
+src/control/pulses.py                   DRAG pulses, Fourier basis, Gaussian filter
+src/control/sequences.py                Bell waveforms, virtual-Z calibration, sequence packing, frame rotation
+src/optimization/losses.py              Calibration and CZ loss functions
+src/optimization/fitters.py             DigitalTwinFitter
+src/optimization/training_loops.py      Optimization loops and setup helpers
+src/verification/qutip_device.py        HiddenDevice: decoherence, shot noise, play_pulse / play_sequence
+src/verification/benchmarks.py          Cross-validation and Ramsey runners
+src/verification/plots.py               3D density-matrix cityscape
+notebooks/                              The three notebooks above
 ```
 
 ## Acknowledgements
 
-I built this project to deepen my hands-on experience with superconducting quantum hardware simulation, digital twin calibration, and optimal pulse control. As a personal learning and development project, much of the codebase, mathematical structuring, and debugging was developed with the assistance of AI coding tools.
+Built as a personal learning project on superconducting-qubit simulation and optimal control, with AI coding assistants used for code structuring and debugging.
