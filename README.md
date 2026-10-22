@@ -28,6 +28,20 @@ Instead of relying on nominal design guesses, the pipeline calibrates unknown ha
 * **Generalization:** Cross-validation against held-out random waveforms showed that calibration reduces population prediction error from $\sim 9.3\%$ down to the physical $T_1/T_2$ noise floor ($\sim 0.09\%$).
 * **Hardware Validation:** Comparing uncalibrated versus calibrated pulses on the QuTiP fridge proves that calibration is essential for eliminating population leakage and achieving an accurate $180^\circ$ phase flip.
 
+### 4. End-to-End Bell State Generation
+
+The final phase of the pipeline ties the calibrated hardware parameters and optimized control pulses together to generate a high-fidelity two-qutrit $\Phi^+$ Bell state. By layering parallel single-qubit DRAG pulses, the flux-optimized CZ gate, and symmetric Virtual-Z phase tracking, the simulation achieves a validated final Bell state fidelity of 96.64%.
+
+### Notebooks Overview
+
+* **`calibrate_and_control.ipynb`**: This is the main interactive workflow notebook. It executes the Digital Twin calibration, gathers swap chevron measurements, and cross-validates the calibrated parameters against the QuTiP hardware simulator.
+
+
+* **`two_qubit_cz_gate.ipynb`**: This notebook focuses on optimal CZ control. It uses JAX-based optimization to shape bandwidth-limited Fourier flux pulses and visualizes the state population dynamics of the CZ gate.
+
+
+* **`analog_bell_state.ipynb`**: The capstone notebook that combines the single-qubit DRAG pulses, the optimized CZ gate, and Virtual-Z phase tracking to assemble and validate the final 96.64% fidelity $\Phi^+$ Bell state.
+
 ## Project Structure
 
 ```text
@@ -42,7 +56,8 @@ src/optimization/training_loops.py      Optimization loop and setup helpers
 src/verification/qutip_device.py        QuTiP 'HiddenDevice' hardware simulator with decoherence & shot noise
 src/verification/benchmarks.py          Cross-validation and Conditional Ramsey experiment runners
 notebooks/two_qubit_cz_gate.ipynb       Optimal CZ control
-notebooks/calibrate_and_control.ipynb   Main interactive workflow notebook
+notebooks/calibrate_and_control.ipynb   Main interactive calibration and validation workflow
+notebooks/analog_bell_state.ipynb       Full pipeline integration and Bell state generation    
 
 ```
 
