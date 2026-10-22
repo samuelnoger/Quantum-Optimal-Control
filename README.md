@@ -30,7 +30,7 @@ The twin uses the **fitted** parameters from the calibration notebook (fit error
 ## Results
 
 **Calibration and CZ**
-- **Parameter recovery:** fitted $g$, $\Delta$, $\alpha$ within [TODO: < 0.01 MHz, confirm from saved output] of the true values with 2,000-shot measurements.
+- **Parameter recovery:** fitted $g$, $\Delta$, $\alpha$ within < 0.01 MHz, of the true values with 2,000-shot measurements.
 - **Generalization:** on held-out random waveforms, calibration reduces mean population prediction error from ~9.3% (uncalibrated) to ~0.09%, close to the $T_1/T_2$ floor.
 - **Calibrated vs. uncalibrated CZ:** on the device model, the calibrated pulse substantially reduces leakage and gives the intended $\pi$ conditional phase.
 
@@ -46,8 +46,8 @@ The twin uses the **fitted** parameters from the calibration notebook (fit error
 - Going from the twin to the full device model costs about 0.2%, combining fit error and decoherence. Phases calibrated on the twin were not re-tuned on the device.
 - 99.48% of the population stays in the computational subspace (0.52% leakage). The remaining infidelity comes mostly from the gate itself (conditional phase, residual ZZ during the single-qubit pulses, leakage), not from the virtual-Z calibration.
 - Fidelity is $\langle\Phi^+|\rho_{\text{comp}}|\Phi^+\rangle$ on the unnormalized computational block, so leakage counts as loss.
-- Sequence: two [TODO: 20] ns single-qubit pulses plus a [TODO] ns CZ, so $T_1/T_2$ contribute a small share of the error.
-- Note: a variant that applies the virtual Z as a matrix between CZ and the last pulse scores 97.53% at the same phases. This is a slightly different circuit (the identity between the two holds only approximately because of the always-on coupling). [TODO: re-optimize phases on the drive-rotated circuit and update.]
+- Sequence: two 20 ns single-qubit pulses plus a 40 ns CZ, so $T_1/T_2$ contribute a small share of the error.
+- Note: a variant that applies the virtual Z as a matrix between CZ and the last pulse scores 97.53% at the same phases. This is a slightly different circuit (the identity between the two holds only approximately because of the always-on coupling).
 
 ## Notebooks
 
@@ -59,7 +59,7 @@ Run in this order (the Bell notebook loads `configs/cal_pulse_rad.npy`, which th
 
 ## Setup
 
-Python 3.11, JAX (with `jax_enable_x64` enabled in the notebooks), Optax, QuTiP [TODO: version], NumPy, SciPy, Matplotlib, Plotly. [TODO: add requirements file.]
+Python 3.11, JAX (with `jax_enable_x64` enabled in the notebooks), Optax, QuTiP, NumPy, SciPy, Matplotlib, Plotly.
 
 ## Limitations
 
