@@ -26,6 +26,12 @@ class HiddenDevice:
         
         # Full static Hamiltonian
         self.H0 = qt.tensor(H1, eye) + qt.tensor(eye, H2) + H_int + 2 * np.pi * (true_detuning / 1000.0) * self.Hz_control
+
+        # --- Local Drive Operators ---
+        Hx = (b + bdag) / 2
+        Hy = (b - bdag) / (2j)
+        self.Hx1, self.Hy1 = qt.tensor(Hx, eye), qt.tensor(Hy, eye)
+        self.Hx2, self.Hy2 = qt.tensor(eye, Hx), qt.tensor(eye, Hy)
         
         # --- Collapse Operators for Decoherence ---
         self.c_ops = []
@@ -79,3 +85,20 @@ class HiddenDevice:
             
         noisy_probs = counts / float(n_shots)
         return noisy_probs[[0, 1, 3, 4]]
+
+    def play_sequence(self, wf, initial_state):
+        """wf: dict of equal-length arrays I1,Q1,I2,Q2,flux in rad/ns (zeros where idle)."""
+        n = len(wf["flux"])
+        tlist = np.arange(n + 1) * self.dt
+    
+        def c(x):
+            x = np.asarray(x, dtype=float)
+            return qt.coefficient(np.append(x, x[-1]), tlist=tlist, order=0)
+    
+        H = qt.QobjEvo([self.H0,
+                        [self.Hz_control, c(wf["flux"])],
+                        [self.Hx1, c(wf["I1"])], [self.Hy1, c(wf["Q1"])],
+                        [self.Hx2, c(wf["I2"])], [self.Hy2, c(wf["Q2"])]])
+        res = qt.mesolve(H, initial_state, tlist, c_ops=self.c_ops,
+                         options={"max_step": self.dt / 2})
+        return res.states[-1]
