@@ -1,6 +1,6 @@
 # Superconducting Two-Qubit CZ Gate: Calibrate-Then-Control Pipeline
 
-A simulation and optimization project for superconducting transmon qutrits. The pipeline (1) characterizes an unknown device with a vectorized swap-chevron fitter, (2) designs a leakage-suppressed, bandwidth-limited CZ gate on the fitted digital twin, and (3) uses that gate in an end-to-end Bell state ($\Phi^+$) circuit.
+A simulation and optimization project for superconducting transmon qutrits. The pipeline characterizes an unknown device with a vectorized swap-chevron fitter, designs a leakage-suppressed, bandwidth-limited CZ gate on the fitted digital twin, and uses that gate in an end-to-end Bell state ($\Phi^+$) circuit.
 
 A JAX digital twin is used for fitting and pulse design. Everything is then checked against a QuTiP `HiddenDevice`, a simulated device with its own "true" parameters, $T_1/T_2$ decoherence and projective-measurement shot noise. All "device" results below are from this simulator, not real hardware.
 
