@@ -10,12 +10,13 @@ def plot_chsh_results(
     *,
     shots=5000,
     figsize=(11, 4),
+    comparison_labels=None,
 ):
     """Plot CHSH correlators and total S values for one experiment."""
-    labels = list(correlators)
+    correlator_labels = list(correlators)
     values = list(correlators.values())
     ideal_values = [1 / np.sqrt(2)] * 3 + [-1 / np.sqrt(2)]
-    x = np.arange(len(labels))
+    x = np.arange(len(correlator_labels))
 
     fig, (ax_correlators, ax_chsh) = plt.subplots(1, 2, figsize=figsize)
     ax_correlators.bar(
@@ -36,7 +37,7 @@ def plot_chsh_results(
     ax_correlators.axhline(0, color="black", linewidth=0.8)
     ax_correlators.set(
         xticks=x,
-        xticklabels=labels,
+        xticklabels=correlator_labels,
         ylim=(-1.0, 1.0),
         ylabel="Parity Correlator",
         title="CHSH Parity Correlators on Hardware",
@@ -44,7 +45,11 @@ def plot_chsh_results(
     ax_correlators.legend()
     ax_correlators.grid(True, alpha=0.3)
 
-    categories = ["Uncorrected\nFrame", "Fridge +\nVirtual-Z", r"Ideal $\Phi^+$"]
+    categories = comparison_labels or [
+        "Uncorrected\nFrame",
+        "Fridge +\nVirtual-Z",
+        r"Ideal $\Phi^+$",
+    ]
     colors = ["purple", "teal", "royalblue"]
     ax_chsh.bar(
         categories,
