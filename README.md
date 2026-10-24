@@ -51,11 +51,12 @@ The twin uses the **fitted** parameters from the calibration notebook (fit error
 
 ## Notebooks
 
-Run in this order (the Bell notebook loads `configs/cal_pulse_rad.npy`, which the calibration notebook saves).
+Run in this order (the Bell notebook loads `artifacts/cal_pulse_rad.npy`, which the calibration notebook saves).
 
-1. **`calibrate_and_control.ipynb`:** swap-chevron calibration, CZ training, cross-validation, Ramsey checks on the device.
-2. **`two_qubit_cz_gate.ipynb`:** CZ optimization and visualization of the $|11\rangle \leftrightarrow |20\rangle$ avoided crossing.
-3. **`analog_bell_state.ipynb`:** virtual-Z calibration on the twin, implementation check (device vs. twin), and the Bell state on the noisy device.
+1. **`01_calibrate_twin.ipynb`:** swap-chevron calibration, CZ training, cross-validation, and Ramsey checks.
+2. **`02_design_cz.ipynb`:** CZ optimization and visualization of the $|11\rangle \leftrightarrow |20\rangle$ avoided crossing.
+3. **`03_bell_state.ipynb`:** virtual-Z calibration, implementation checks, and Bell-state execution.
+4. **`04_chsh.ipynb`:** CHSH measurement protocol.
 
 ## Setup
 
@@ -70,20 +71,30 @@ Python 3.11, JAX (with `jax_enable_x64` enabled in the notebooks), Optax, QuTiP,
 ## Project Structure
 
 ```text
-configs/two_qubit_CZ.yaml               Hardware and optimizer configuration
+configs/                                Hardware and optimizer configuration
+artifacts/                              Saved calibration outputs (gitignored)
 src/config.py                           Configuration parser
-src/physics/operators.py                Transmon and two-qubit Hamiltonian builders
-src/physics/propagators.py              JAX time-evolution step functions
-src/control/pulses.py                   DRAG pulses, Fourier basis, Gaussian filter
-src/control/sequences.py                Bell waveforms, virtual-Z calibration, sequence packing, frame rotation
-src/optimization/losses.py              Calibration and CZ loss functions
-src/optimization/fitters.py             DigitalTwinFitter
-src/optimization/training_loops.py      Optimization loops and setup helpers
-src/verification/qutip_device.py        HiddenDevice: decoherence, shot noise, play_pulse / play_sequence
-src/verification/benchmarks.py          Cross-validation and Ramsey runners
-src/verification/plots.py               3D density-matrix cityscape
-notebooks/                              The three notebooks above
+src/physics/operators.py                Hamiltonian builders
+src/physics/propagators.py              Time-evolution propagators
+src/devices/qutip_device.py             HiddenDevice simulator
+src/control/pulses.py                   DRAG pulses and filters
+src/control/waveforms.py                Bell waveforms and sequence packing
+src/control/virtual_z.py                Virtual-Z matrices and frame application
+src/calibration/fitters.py              Digital twin fitting
+src/calibration/cz_training.py          CZ losses and training loops
+src/calibration/virtual_z_cal.py        Virtual-Z calibration entry point
+src/experiments/ramsey.py               Ramsey and held-out probe experiments
+src/experiments/chsh.py                 CHSH experiment
+src/experiments/tomography.py           QuTiP pulse verification
+src/analysis/metrics.py                 Fidelity and leakage metrics
+src/analysis/plots.py                   Visualization helpers
+notebooks/                              Calibration, CZ, Bell-state, and CHSH notebooks
+tests/                                  Automated twin/device regression tests
 ```
+
+The domain packages are the only supported import paths. The old
+`src.optimization`, `src.verification`, and `src.control.sequences` modules
+were removed during the reorganization.
 
 ## Acknowledgements
 
