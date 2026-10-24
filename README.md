@@ -85,7 +85,7 @@ src/calibration/cz_training.py          CZ losses and training loops
 src/calibration/virtual_z_cal.py        Virtual-Z calibration entry point
 src/experiments/ramsey.py               Ramsey and held-out probe experiments
 src/experiments/chsh.py                 CHSH experiment
-src/experiments/tomography.py           QuTiP pulse verification
+src/experiments/sinle_qubit_check.py    QuTiP pulse verification
 src/analysis/metrics.py                 Fidelity and leakage metrics
 src/analysis/plots.py                   Visualization helpers
 notebooks/                              Calibration, CZ, Bell-state, and CHSH notebooks
