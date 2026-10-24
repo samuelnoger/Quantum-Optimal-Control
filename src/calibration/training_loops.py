@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from src.physics.operators import build_two_qubit_operators
 from src.control.pulses import make_gaussian_kernel
-from src.optimization.losses import compute_cz_loss
+from src.calibration.cz_training import compute_cz_loss
 
 
 def make_cz_optimizer(learning_rate: float, steps: int):

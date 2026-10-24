@@ -1,5 +1,84 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+
+
+def plot_chsh_results(
+    correlators,
+    chsh_values,
+    chsh_errors,
+    *,
+    shots=5000,
+    figsize=(11, 4),
+):
+    """Plot CHSH correlators and total S values for one experiment."""
+    labels = list(correlators)
+    values = list(correlators.values())
+    ideal_values = [1 / np.sqrt(2)] * 3 + [-1 / np.sqrt(2)]
+    x = np.arange(len(labels))
+
+    fig, (ax_correlators, ax_chsh) = plt.subplots(1, 2, figsize=figsize)
+    ax_correlators.bar(
+        x - 0.18,
+        ideal_values,
+        width=0.35,
+        alpha=0.5,
+        color="gray",
+        label=r"Ideal $\Phi^+$ ($\pm 1/\sqrt{2}$)",
+    )
+    ax_correlators.bar(
+        x + 0.18,
+        values,
+        width=0.35,
+        color="teal",
+        label=f"QuTiP Fridge ({shots:,} shots)",
+    )
+    ax_correlators.axhline(0, color="black", linewidth=0.8)
+    ax_correlators.set(
+        xticks=x,
+        xticklabels=labels,
+        ylim=(-1.0, 1.0),
+        ylabel="Parity Correlator",
+        title="CHSH Parity Correlators on Hardware",
+    )
+    ax_correlators.legend()
+    ax_correlators.grid(True, alpha=0.3)
+
+    categories = ["Uncorrected\nFrame", "Fridge +\nVirtual-Z", r"Ideal $\Phi^+$"]
+    colors = ["purple", "teal", "royalblue"]
+    ax_chsh.bar(
+        categories,
+        chsh_values,
+        yerr=chsh_errors,
+        capsize=6,
+        color=colors,
+        alpha=0.85,
+        width=0.4,
+    )
+    ax_chsh.axhline(
+        2.0,
+        color="darkorange",
+        linestyle="--",
+        linewidth=2,
+        label="Classical Bound (S = 2.0)",
+    )
+    ax_chsh.axhline(
+        2 * np.sqrt(2),
+        color="navy",
+        linestyle=":",
+        linewidth=2,
+        label=r"Quantum Bound ($2\sqrt{2} \approx 2.828$)",
+    )
+    ax_chsh.set(
+        ylim=(0, 3.2),
+        ylabel="CHSH Parameter S",
+        title="Bell Inequality Violation",
+    )
+    ax_chsh.legend(loc="lower right")
+    ax_chsh.grid(True, alpha=0.3)
+
+    fig.tight_layout()
+    return fig
 
 def plot_absolute_cityscape(rho_matrix, title="Analog Bell State: True Physical Entanglement"):
     """

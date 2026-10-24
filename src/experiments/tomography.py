@@ -9,11 +9,11 @@ def verify_pulse_qutip(config: ExperimentConfig, I_pulse: np.ndarray, Q_pulse: n
     if c_ops is None:
         c_ops = []
 
-    # 1. Physical Constants
+    # Physical Constants
     alpha = 2 * np.pi * (config.hardware.anharmonicity_mhz / 1000.0)
     levels = config.hardware.levels
     
-    # 2. QuTiP Operators
+    # QuTiP Operators
     a = qt.destroy(levels)
     
     # Drift Hamiltonian (Energy levels in rotating frame)
@@ -24,18 +24,18 @@ def verify_pulse_qutip(config: ExperimentConfig, I_pulse: np.ndarray, Q_pulse: n
     Hx = (a + a.dag()) / 2.0
     Hy = (a - a.dag()) / (2.0j)
     
-    # 3. Time-dependent Hamiltonian format for QuTiP
+    # Time-dependent Hamiltonian format for QuTiP
     # Note: QuTiP expects cubic spline interpolation or raw arrays matching tlist
     H = [H0, [Hx, np.array(I_pulse)], [Hy, np.array(Q_pulse)]]
     
-    # 4. Time array (converting dt to match the JAX steps)
+    # Time array (converting dt to match the JAX steps)
     tlist = np.arange(0, config.pulse.duration_ns, config.pulse.dt_ns)
     
     # Ensure time list matches pulse length perfectly
     if len(tlist) > len(I_pulse):
         tlist = tlist[:len(I_pulse)]
     
-    # 5. Run simulation
+    # Run simulation
     psi0 = qt.basis(levels, 0) # Start in |0>
     target_state = qt.basis(levels, 1) # Target is |1> (for a pi-pulse)
     

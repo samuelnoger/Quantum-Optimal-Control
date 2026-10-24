@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 import optax
 from tqdm import tqdm
-from src.optimization.losses import calibration_loss
+from src.calibration.cz_training import calibration_loss
 
 class DigitalTwinFitter:
     def __init__(self, dt_step, H_anharm_base, H_int_base, Hz_control, learning_rate=0.1):

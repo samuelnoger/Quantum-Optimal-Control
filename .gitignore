@@ -11,6 +11,8 @@ env/
 .ipynb_checkpoints/
 notebooks/iframe_figures/
 
+artifacts/
+
 # OS / IDE files
 .DS_Store
 .vscode/
@@ -18,5 +20,7 @@ notebooks/iframe_figures/
 
 # Output plots and data runs
 outputs/
+artifacts/*
+!artifacts/.gitkeep
 *.png
 *.npy
